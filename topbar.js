@@ -282,11 +282,12 @@ body.topbar-modal-open { overflow: hidden; touch-action: none; }
         .from('app_state').select('data').eq('key', 'health').maybeSingle();
       const current = (data && data.data) || {};
       const merged = Object.assign({}, current, { po_water_v1: localWater });
-      await supa.from('app_state').upsert(
+      const { error } = await supa.from('app_state').upsert(
         { key: 'health', data: merged, updated_at: new Date().toISOString() },
         { onConflict: 'key' }
       );
-    } catch (e) {}
+      if (error) alert('Water sync error: ' + (error.message || JSON.stringify(error)));
+    } catch (e) { alert('Water sync failed: ' + (e.message || JSON.stringify(e))); }
   }
   function addWater() {
     let state = null;

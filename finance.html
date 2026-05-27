@@ -2759,7 +2759,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       if (rEl) rEl.value = '';
       if (tEl) tEl.checked = false;
       renderSubs();
-    } catch (e) { console.error('subAdd failed', e); }
+    } catch (e) { console.error('subAdd failed', e); alert('Add subscription failed: ' + (e.message || JSON.stringify(e))); }
   }
   // Add button uses event delegation (see safety-net at the bottom).
   // Enter key on the inputs still triggers add directly.
@@ -2880,7 +2880,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       storeSet('wishlist', arr);
       nEl.value = ''; aEl.value = '';
       renderWishlist();
-    } catch (e) { console.error('wishAdd failed', e); }
+    } catch (e) { console.error('wishAdd failed', e); alert('Add wishlist item failed: ' + (e.message || JSON.stringify(e))); }
   }
   // Add button uses inline onclick + delegation. Enter on the inputs:
   const _wishName   = document.getElementById('wishName');
@@ -3232,7 +3232,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       if (dEl) dEl.value = '';
       updateOrdPreview();
       renderOrders();
-    } catch (e) { console.error('ordAdd failed', e); }
+    } catch (e) { console.error('ordAdd failed', e); alert('Add order failed: ' + (e.message || JSON.stringify(e))); }
   }
   window.__addOrder = doOrdAdd;
   // Wire live-preview listeners

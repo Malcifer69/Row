@@ -3434,7 +3434,8 @@ img, video, canvas, svg { max-width: 100%; }
           { onConflict: 'key' }
         );
       if (!error) pcLastSyncedJson = json;
-    } catch (_) {}
+      else alert('Gym sync error: ' + (error.message || JSON.stringify(error)));
+    } catch (e) { alert('Gym sync push failed: ' + (e.message || JSON.stringify(e))); }
   }
 
   function pcSchedulePush() {
@@ -3476,13 +3477,15 @@ img, video, canvas, svg { max-width: 100%; }
     try {
       const { data, error } = await pcSupa
         .from('app_state').select('data').eq('key', APP_KEY).maybeSingle();
-      if (!error && data && data.data && Object.keys(data.data).length > 0) {
+      if (error) {
+        alert('Gym sync init error: ' + (error.message || JSON.stringify(error)));
+      } else if (data && data.data && Object.keys(data.data).length > 0) {
         pcLastSyncedJson = JSON.stringify(data.data);
         pcMaybeApplyRemote(data.data);
       } else if (Object.keys(pcCollectState()).length > 0) {
         pcSchedulePush();
       }
-    } catch (_) {}
+    } catch (e) { alert('Gym sync init failed: ' + (e.message || JSON.stringify(e))); }
     pcSupa.channel('app_state_' + APP_KEY)
       .on('postgres_changes', {
         event: '*',

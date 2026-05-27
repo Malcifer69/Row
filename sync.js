@@ -83,7 +83,8 @@
           { onConflict: 'key' }
         );
         if (!error) lastSyncedJson = json;
-      } catch (e) {}
+        else alert('Sync push error: ' + (error.message || JSON.stringify(error)));
+      } catch (e) { alert('Sync push failed: ' + (e.message || JSON.stringify(e))); }
     }
     function schedulePush() { clearTimeout(pushTimer); pushTimer = setTimeout(pushNow, 250); }
     function flushOnUnload() {
@@ -109,13 +110,15 @@
       supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       try {
         const { data, error } = await supa.from('app_state').select('data').eq('key', appKey).maybeSingle();
-        if (!error && data && data.data && Object.keys(data.data).length > 0) {
+        if (error) {
+          alert('Sync init error: ' + (error.message || JSON.stringify(error)));
+        } else if (data && data.data && Object.keys(data.data).length > 0) {
           lastSyncedJson = JSON.stringify(data.data);
           applyRemote(data.data);
         } else if (Object.keys(collect()).length > 0) {
           schedulePush();
         }
-      } catch (e) {}
+      } catch (e) { alert('Sync init failed: ' + (e.message || JSON.stringify(e))); }
       supa.channel('app_state_' + appKey)
         .on('postgres_changes', {
           event: '*', schema: 'public', table: 'app_state', filter: 'key=eq.' + appKey,
