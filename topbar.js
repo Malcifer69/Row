@@ -264,6 +264,18 @@ body.topbar-modal-open { overflow: hidden; touch-action: none; }
     setPillStatus(waterEl, classifyStatus(w.done, w.total));
   }
 
+  // Created once at module load — avoids re-triggering GoTrue init on every write (iOS fix).
+  let _topbarSupa = null;
+  function getTopbarSupa() {
+    if (!_topbarSupa && window.supabase && TOPBAR_SUPABASE_URL && TOPBAR_SUPABASE_KEY &&
+        TOPBAR_SUPABASE_URL.indexOf('PASTE-') !== 0) {
+      _topbarSupa = window.supabase.createClient(TOPBAR_SUPABASE_URL, TOPBAR_SUPABASE_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+      });
+    }
+    return _topbarSupa;
+  }
+
   function defaultWaterState() {
     return {
       unit: 'bottle', bottleMl: 500, glassMl: 250, weightUnit: 'kg',
@@ -277,7 +289,7 @@ body.topbar-modal-open { overflow: hidden; touch-action: none; }
     if (!window.supabase || !TOPBAR_SUPABASE_URL || !TOPBAR_SUPABASE_KEY) return;
     if (TOPBAR_SUPABASE_URL.indexOf('PASTE-') === 0) return;
     try {
-      const supa = window.supabase.createClient(TOPBAR_SUPABASE_URL, TOPBAR_SUPABASE_KEY);
+      const supa = getTopbarSupa();
       const { data } = await supa
         .from('app_state').select('data').eq('key', 'health').maybeSingle();
       const current = (data && data.data) || {};
